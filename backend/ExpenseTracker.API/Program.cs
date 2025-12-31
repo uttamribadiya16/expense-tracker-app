@@ -83,18 +83,27 @@ using (var scope = app.Services.CreateScope())
         var authService = services.GetRequiredService<IAuthService>();
         
         // Simple retry strategy for database availability
-        int retries = 10;
+        int retries = 15;
         while (retries > 0)
         {
             try
             {
-                if (context.Database.GetPendingMigrations().Any())
+                logger.LogInformation($"Checking database connectivity... {retries} retries left.");
+
+                // 1. Check connection to 'master' to ensure SQL Server is up
+                var masterConnectionString = connectionString.Replace("Database=ExpenseTrackerDb", "Database=master");
+                using (var masterConnection = new Microsoft.Data.SqlClient.SqlConnection(masterConnectionString))
                 {
-                    context.Database.Migrate();
+                    await masterConnection.OpenAsync();
+                    logger.LogInformation("Successfully connected to SQL Server (master).");
                 }
 
-                // Seed Users
-                if (!context.Users.Any())
+                // 2. Now run migrations (which will create ExpenseTrackerDb if missing)
+                logger.LogInformation("Applying migrations...");
+                await context.Database.MigrateAsync();
+                
+                // 3. Seed Users
+                if (!await context.Users.AnyAsync())
                 {
                     logger.LogInformation("Seeding default users...");
                     var demoUser = new UserRegisterDto 
@@ -109,12 +118,11 @@ using (var scope = app.Services.CreateScope())
 
                 break; // Success
             }
-            catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 4060 || ex.Number == 18456)
+            catch (Exception ex)
             {
-                // 4060: Cannot open database, 18456: Login failed
-                logger.LogWarning($"Database not ready yet. Retrying in 2 seconds... ({retries} attempts left)");
+                logger.LogWarning(ex, $"Database unavailable. Retrying in 3 seconds... ({retries} attempts left)");
                 retries--;
-                System.Threading.Thread.Sleep(2000);
+                System.Threading.Thread.Sleep(3000);
             }
         }
     }
