@@ -1,5 +1,5 @@
 # Use the official .NET SDK image to build the app
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 
 # Copy the solution file and project files
@@ -20,7 +20,7 @@ WORKDIR /app/ExpenseTracker.API
 RUN dotnet publish -c Release -o /app/out
 
 # Use the official .NET runtime image for the final image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=build /app/out .
 
