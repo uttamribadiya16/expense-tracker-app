@@ -23,48 +23,40 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }`;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <div className="bg-indigo-600 p-2 rounded-lg mr-2">
-                   <LayoutDashboard className="w-6 h-6 text-white" />
-                </div>
-                <span className="font-bold text-xl tracking-tight text-gray-900">ExpenseTracker</span>
-              </div>
-              <div className="hidden sm:ml-8 sm:flex sm:space-x-8">
-                <Link to="/" className={navClass('/')}>
-                  <LayoutDashboard className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Link>
-                <Link to="/expenses" className={navClass('/expenses')}>
-                  <List className="w-4 h-4 mr-2" />
-                  Expenses
-                </Link>
-                <Link to="/add" className={navClass('/add')}>
-                  <PlusCircle className="w-4 h-4 mr-2" />
-                  Add Expense
-                </Link>
-              </div>
+    <div className="min-h-screen bg-base-100 flex flex-col font-sans text-base-content">
+      <nav className="navbar bg-base-200 shadow-md">
+        <div className="app-container w-full flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="bg-primary p-2 rounded-lg text-primary-content">
+              <LayoutDashboard className="w-6 h-6" />
             </div>
-            <div className="flex items-center space-x-4">
-                <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium">
-                    {user?.username || 'User'}
-                </div>
-                <button 
-                  onClick={handleLogout}
-                  className="p-2 text-gray-400 hover:text-gray-600"
-                  title="Logout"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
+            <span className="font-bold text-lg">ExpenseTracker</span>
+            <div className="hidden sm:flex sm:space-x-2 ml-6">
+              <Link to="/" className={navClass('/')}>
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Dashboard
+              </Link>
+              <Link to="/expenses" className={navClass('/expenses')}>
+                <List className="w-4 h-4 mr-2" />
+                Expenses
+              </Link>
+              <Link to="/add" className={navClass('/add')}>
+                <PlusCircle className="w-4 h-4 mr-2" />
+                Add Expense
+              </Link>
             </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <div className="badge badge-primary badge-outline">{user?.username || 'User'}</div>
+            <button onClick={handleLogout} className="btn btn-ghost btn-sm" title="Logout">
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </nav>
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8">
+
+      <main className="flex-1 app-container p-6">
         {children}
       </main>
     </div>
