@@ -1,0 +1,75 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: YourStrong!Password123
+        ports:
+          - 1433:1433
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Backend
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore Backend Dependencies
+      run: dotnet restore backend/ExpenseTracker.sln
+
+    - name: Build Backend
+      run: dotnet build backend/ExpenseTracker.sln --no-restore
+
+    # Frontend
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install Frontend Dependencies
+      run: cd frontend && npm ci
+
+    - name: Build Frontend
+      run: cd frontend && npm run build
+
+  docker-push:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and Push Backend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-backend:latest
+
+    - name: Build and Push Frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-frontend:latest

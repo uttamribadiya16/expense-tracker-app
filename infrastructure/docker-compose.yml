@@ -1,0 +1,51 @@
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: expense-backend
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=${MSSQL_DB_NAME};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - mssql
+    networks:
+      - expense-net
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: expense-frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    environment:
+      - VITE_API_URL=${API_BASE_URL}
+    depends_on:
+      - backend
+    networks:
+      - expense-net
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: expense-mssql
+    accept_license: true
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql/data
+    networks:
+      - expense-net
+
+volumes:
+  mssql_data:
+
+networks:
+  expense-net:
+    driver: bridge
