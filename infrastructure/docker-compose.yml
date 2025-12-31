@@ -18,6 +18,8 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${API_BASE_URL}
     container_name: expense-frontend
     ports:
       - "${FRONTEND_PORT:-3000}:80"
