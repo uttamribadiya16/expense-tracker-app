@@ -91,7 +91,10 @@ using (var scope = app.Services.CreateScope())
                 logger.LogInformation($"Checking database connectivity... {retries} retries left.");
 
                 // 1. Check connection to 'master' to ensure SQL Server is up
-                var masterConnectionString = connectionString.Replace("Database=ExpenseTrackerDb", "Database=master");
+                var connectionStringBuilder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
+                connectionStringBuilder.InitialCatalog = "master";
+                var masterConnectionString = connectionStringBuilder.ConnectionString;
+
                 using (var masterConnection = new Microsoft.Data.SqlClient.SqlConnection(masterConnectionString))
                 {
                     await masterConnection.OpenAsync();
