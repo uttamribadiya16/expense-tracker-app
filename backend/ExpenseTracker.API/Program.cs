@@ -23,7 +23,7 @@ if (string.IsNullOrEmpty(connectionString))
 }
 
 builder.Services.AddDbContext<ExpenseDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
 // Dependency Injection
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
