@@ -17,6 +17,14 @@ This folder contains the Docker Compose configuration to run the entire stack.
     docker compose up -d
     ```
 
+## Access Information
+
+Once running, you can access the projects at the following URLs:
+
+- **Frontend Application**: http://localhost:3000
+- **Backend API (Swagger)**: http://localhost:8080/swagger
+- **Database (Internal)**: mssql:1433 (Exposed locally on port 1433)
+
 ## Persistence
 
 SQL Server data is stored in the `mssql_data` Docker volume. To reset data:
