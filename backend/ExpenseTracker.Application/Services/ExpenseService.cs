@@ -19,28 +19,29 @@ namespace ExpenseTracker.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ExpenseDto>> GetAllExpensesAsync()
+        public async Task<IEnumerable<ExpenseDto>> GetAllExpensesAsync(int userId)
         {
-            var expenses = await _repository.GetAllAsync();
+            var expenses = await _repository.GetAllAsync(userId);
             return _mapper.Map<IEnumerable<ExpenseDto>>(expenses);
         }
 
-        public async Task<ExpenseDto?> GetExpenseByIdAsync(int id)
+        public async Task<ExpenseDto?> GetExpenseByIdAsync(int id, int userId)
         {
-            var expense = await _repository.GetByIdAsync(id);
+            var expense = await _repository.GetByIdAsync(id, userId);
             return _mapper.Map<ExpenseDto>(expense);
         }
 
-        public async Task<ExpenseDto> CreateExpenseAsync(CreateExpenseDto expenseDto)
+        public async Task<ExpenseDto> CreateExpenseAsync(CreateExpenseDto expenseDto, int userId)
         {
             var expense = _mapper.Map<Expense>(expenseDto);
+            expense.UserId = userId;
             var createdExpense = await _repository.AddAsync(expense);
             return _mapper.Map<ExpenseDto>(createdExpense);
         }
 
-        public async Task UpdateExpenseAsync(int id, CreateExpenseDto expenseDto)
+        public async Task UpdateExpenseAsync(int id, CreateExpenseDto expenseDto, int userId)
         {
-            var existingExpense = await _repository.GetByIdAsync(id);
+            var existingExpense = await _repository.GetByIdAsync(id, userId);
             if (existingExpense != null)
             {
                 _mapper.Map(expenseDto, existingExpense);
@@ -48,9 +49,13 @@ namespace ExpenseTracker.Application.Services
             }
         }
 
-        public async Task DeleteExpenseAsync(int id)
+        public async Task DeleteExpenseAsync(int id, int userId)
         {
-            await _repository.DeleteAsync(id);
+            var expense = await _repository.GetByIdAsync(id, userId);
+            if (expense != null)
+            {
+                await _repository.DeleteAsync(id);
+            }
         }
     }
 }

@@ -1,9 +1,17 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, List, PlusCircle } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, List, PlusCircle, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -41,10 +49,17 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 </Link>
               </div>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
                 <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium">
-                    Hello, User
+                    {user?.username || 'User'}
                 </div>
+                <button 
+                  onClick={handleLogout}
+                  className="p-2 text-gray-400 hover:text-gray-600"
+                  title="Logout"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
             </div>
           </div>
         </div>

@@ -16,14 +16,14 @@ namespace ExpenseTracker.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Expense>> GetAllAsync()
+        public async Task<IEnumerable<Expense>> GetAllAsync(int userId)
         {
-            return await _context.Expenses.ToListAsync();
+            return await _context.Expenses.Where(e => e.UserId == userId).ToListAsync();
         }
 
-        public async Task<Expense?> GetByIdAsync(int id)
+        public async Task<Expense?> GetByIdAsync(int id, int userId)
         {
-            return await _context.Expenses.FindAsync(id);
+            return await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         }
 
         public async Task<Expense> AddAsync(Expense expense)

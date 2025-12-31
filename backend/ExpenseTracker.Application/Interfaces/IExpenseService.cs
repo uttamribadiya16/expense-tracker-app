@@ -6,10 +6,10 @@ namespace ExpenseTracker.Application.Interfaces
 {
     public interface IExpenseService
     {
-        Task<IEnumerable<ExpenseDto>> GetAllExpensesAsync();
-        Task<ExpenseDto?> GetExpenseByIdAsync(int id);
-        Task<ExpenseDto> CreateExpenseAsync(CreateExpenseDto expenseDto);
-        Task UpdateExpenseAsync(int id, CreateExpenseDto expenseDto);
-        Task DeleteExpenseAsync(int id);
+        Task<IEnumerable<ExpenseDto>> GetAllExpensesAsync(int userId);
+        Task<ExpenseDto?> GetExpenseByIdAsync(int id, int userId);
+        Task<ExpenseDto> CreateExpenseAsync(CreateExpenseDto expenseDto, int userId);
+        Task UpdateExpenseAsync(int id, CreateExpenseDto expenseDto, int userId);
+        Task DeleteExpenseAsync(int id, int userId);
     }
 }
